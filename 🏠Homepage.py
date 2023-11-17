@@ -72,11 +72,11 @@ if sale_rent:
             property_type = property_types_rent
         else:
             property_type = property_types_sale
-    if len(zips)<2:
+    if len(zips)>1:
         zips_str = ','.join(zips)
     else:
         zips_str = zips
-    if len(provinces)<2:
+    if len(provinces)>1:
         provinces_str = ','.join(provinces)
     else:
         provinces_str = provinces
