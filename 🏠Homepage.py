@@ -87,18 +87,15 @@ if sale_rent:
         result = df_transform(result)
         
         if sale_rent=='for-sale':
-            result['MainValue/Surface'] = result['price.mainValue'].astype('Int64')/result['property.netHabitableSurface'].astype('Int64') # 'price.mainValue' , 'transaction.sale.price'
+            result['MainValue/Surface'] = result['price.mainValue'].astype('Int64')/result['property.netHabitableSurface'].astype('Int64')
         
         st.dataframe(result)
-        # st.dataframe(result_new)
         
         output = BytesIO()
         with pd.ExcelWriter(output, engine='xlsxwriter') as writer:  
             result.to_excel(writer, sheet_name='Results', index=False)
-
-            # writer.close()
-
-            st.download_button(label='📥 Download Search Results',
+            
+        st.download_button(label='📥 Download Search Results',
                                             data=output ,
                                             file_name= 'immoweb.xlsx',
                                             mime="application/vnd.ms-excel")
