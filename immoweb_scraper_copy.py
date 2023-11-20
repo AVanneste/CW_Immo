@@ -13,7 +13,7 @@ def get_data_from_search_results(i, property_type, rent_sale, provinces, zips, s
     return pd.json_normalize(session.get(api_url).json()['results'])
 
 def get_data_for_category(property_type, rent_sale, provinces, zips, session):
-    return pd.concat(thread_map(functools.partial(get_data_from_search_results, property_type=property_type, rent_sale=rent_sale, provinces=provinces, zips=zips, session=session), range(1, 10)))
+    return pd.concat(thread_map(functools.partial(get_data_from_search_results, property_type=property_type, rent_sale=rent_sale, provinces=provinces, zips=zips, session=session), range(1, 100)))
 
 def get_property(id, session):
     property_url = f"https://www.immoweb.be/en/classified/{id}"
