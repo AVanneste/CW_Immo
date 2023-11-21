@@ -3,6 +3,7 @@ import streamlit as st
 from io import BytesIO
 import immoweb_scraper
 import immoweb_scraper_copy
+import json
 from df_transform import df_transform
 
 #TO DO: PAGES LIMIT 
@@ -27,68 +28,59 @@ st.title('Immoweb Scraper')
 
 #data selection and filters
 
-df_bel = pd.read_excel('Division geographique.xlsx')
-df_bel = df_bel[['ZIP_code', 'Locality_Name_NL', 'Locality_Name_FR', 'District_Name_NL', 
-                 'District_Name_FR', 'Region_Name_NL', 'Region_Name_FR', 'Arrondissement', 'Commune']]
+with open('search_data.json') as json_file:
+    search_data = json.load(json_file)
 
-df_bel['Commune'] = df_bel['Commune'] + '(Commune)'
-df_bel['ZIP_code'] = df_bel['ZIP_code'].astype(str)
-
-property_types_rent = ['apartment', 'house', 'garage', 'office', 'business', 'industry', 'land', 'other']
-property_types_sale = ['apartment', 'house', 'new-real-estate-projects', 'garage', 'office', 'business', 'industry', 'land', 'tenement', 'other']
-
-province_list = ['LIEGE','HAINAUT','LUXEMBOURG','FLEMISH_BRABANT','WALLOON_BRABANT','EAST_FLANDERS','WEST_FLANDERS','LIMBURG','ANTWERP']
-
-dict_bel = {}
-for column in df_bel.columns.to_list():
-    values = sorted(list(df_bel[column].unique()))
-    dict_bel[column] = values
-
+def format_func(option):
+    return search_data['search_fields'][option]
 
 #select boxes and display
 sale_rent = st.selectbox('Buy or Rent?', ['for-sale', 'for-rent'], index=None, placeholder='Select For Sale or For Rent option')
 
 if sale_rent:
     if sale_rent == 'for-rent':
-        property_type = st.multiselect('Which type(s) of property for rent are you looking for? (leave empty if you want everything)', property_types_rent)
+        property_type = st.multiselect('Which type(s) of property for rent are you looking for? (leave empty if you want everything)', search_data['property_types_rent'])
     else:
-        property_type = st.multiselect('Which type(s) of property for sale are you looking for? (leave empty if you want everything)', property_types_sale)
+        property_type = st.multiselect('Which type(s) of property for sale are you looking for? (leave empty if you want everything)', search_data['property_types_sale'])
     
     st.markdown('Where do you want to search?')
-    zips = st.multiselect('Which zip code(s) do you want to search?', dict_bel['ZIP_code'])
+    zips = st.multiselect('Which zip code(s) or localitie(s) do you want to search?', options=list(search_data['search_fields'].keys()), format_func=lambda x: search_data['search_fields'].get(x))
+    districts = st.multiselect('Which district(s) do you want to search?', sorted(search_data['districts']))
+    provinces = st.multiselect('Which province(s)/region do you want to search?', sorted(search_data['provinces']))
+    
     # localities = st.multiselect('Which locality.ies do you want to search?', dict_bel['Locality_Name_FR'] + dict_bel['Locality_Name_NL'])
     # communes = st.multiselect('Which commune(s) do you want to search?', dict_bel['Commune'])
-    # districts = st.multiselect('Which district(s) do you want to search?', dict_bel['District_Name_NL'] + dict_bel['District_Name_FR'])
     # arrondissements = st.multiselect('Which arrondissement(s) do you want to search?', dict_bel['Arrondissement'])
-    provinces = st.multiselect('Which province(s) do you want to search?', province_list)
-    # regions = st.multiselect('Which region(s) do you want to search?', dict_bel['Region_Name_FR'] + dict_bel['Region_Name_NL'])
+    # regions = st.multiselect('Which region(s) do you want to search?', region_list)
 
     if not property_type:
         if sale_rent == 'for-rent':
-            property_type = property_types_rent
+            property_type = search_data['property_types_rent']
         else:
-            property_type = property_types_sale
+            property_type = search_data['property_types_sale']
 
-    for zip in zips:
-        zip = 'BE-'+zip
+    # for zip in zips:
+    #     print(zip)
+    #     print(zip[0])
+    #     zip = 'BE-'+ str(zip[0:4])
     zips_str = ','.join(zips)
-
     provinces_str = ','.join(provinces)
+    districts_str = ','.join((districts))
 
 
     # Process and save results
     if st.button('Search'):
-        
-        # result = immoweb_scraper.run(sale_rent, property_type, provinces_str, zips_str)
-        result = immoweb_scraper_copy.run_copy(sale_rent, property_type, provinces_str, zips_str)
-        result = result.drop_duplicates(subset='id')
-        result.insert(1, 'url', 'https://www.immoweb.be/en/classified/' + result['id'].astype(str))
-        
-        result = df_transform(result)
-        
-        if sale_rent=='for-sale':
-            result['MainValue/Surface'] = result['price.mainValue'].astype('Int64')/result['property.netHabitableSurface'].astype('Int64')
-        
+
+        with st.spinner('Wait for it...'):
+
+            result = immoweb_scraper_copy.run(sale_rent, property_type, provinces_str, districts_str, zips_str)
+            result = result.drop_duplicates(subset='id')
+            result.insert(1, 'url', 'https://www.immoweb.be/en/classified/' + result['id'].astype(str))
+            result = df_transform(result)
+            
+            if sale_rent=='for-sale':
+                result['MainValue/Surface'] = result['price.mainValue'].astype('Int64')/result['property.netHabitableSurface'].astype('Int64')
+            
         st.dataframe(result)
         
         output = BytesIO()

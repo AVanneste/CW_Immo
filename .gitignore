@@ -2,3 +2,6 @@ __pycache__/
 .devcontainer/
 file.txt
 tests.ipynb
+localities.py
+Division geographique.xlsx
+immoweb.xlsx

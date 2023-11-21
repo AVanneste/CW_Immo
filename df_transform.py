@@ -25,3 +25,25 @@ def df_transform(df):
     df = df.drop(to_drop, axis=1)
     
     return df
+
+def copy_group_values(df_group, df_units):
+    
+    for id in df_units['cluster.projectInfo.groupId'].unique().tolist():
+        print(id)
+        print(df_group['property.location.country'].loc[df_group['id']==id])
+        df_group.loc[df_group['cluster.projectInfo.groupId']==id, 'property.location.country'] = df_group['property.location.country'].loc[df_group['id']==id].values[0]
+        df_group.loc[df_group['cluster.projectInfo.groupId']==id, 'property.location.region'] = df_group['property.location.region'].loc[df_group['id']==id].values[0]
+        df_group.loc[df_group['cluster.projectInfo.groupId']==id, 'property.location.province'] = df_group['property.location.province'].loc[df_group['id']==id].values[0]
+        df_group.loc[df_group['cluster.projectInfo.groupId']==id, 'property.location.district'] = df_group['property.location.district'].loc[df_group['id']==id].values[0]
+        df_group.loc[df_group['cluster.projectInfo.groupId']==id, 'property.location.locality'] = df_group['property.location.locality'].loc[df_group['id']==id].values[0]
+        df_group.loc[df_group['cluster.projectInfo.groupId']==id, 'property.location.postalCode'] = df_group['property.location.postalCode'].loc[df_group['id']==id].values[0]
+        df_group.loc[df_group['cluster.projectInfo.groupId']==id, 'property.location.street'] = df_group['property.location.street'].loc[df_group['id']==id].values[0]
+        df_group.loc[df_group['cluster.projectInfo.groupId']==id, 'property.location.number'] = df_group['property.location.number'].loc[df_group['id']==id].values[0]
+        # df_group.loc[df_group['cluster.projectInfo.groupId']==id, 'property.location.box'] = df_group['property.location.box'].loc[df_group['id']==id]
+        df_group.loc[df_group['cluster.projectInfo.groupId']==id, 'property.location.propertyName'] = df_group['property.location.propertyName'].loc[df_group['id']==id].values[0]
+        df_group.loc[df_group['cluster.projectInfo.groupId']==id, 'property.location.latitude'] = df_group['property.location.latitude'].loc[df_group['id']==id].values[0]
+        df_group.loc[df_group['cluster.projectInfo.groupId']==id, 'property.location.longitude'] = df_group['property.location.longitude'].loc[df_group['id']==id].values[0]
+        df_group.loc[df_group['cluster.projectInfo.groupId']==id, 'property.location.regionCode'] = df_group['property.location.regionCode'].loc[df_group['id']==id].values[0]
+        df_group.loc[df_group['cluster.projectInfo.groupId']==id, 'property.location.placeName'] = df_group['property.location.placeName'].loc[df_group['id']==id].values[0]
+        
+    return df_group
