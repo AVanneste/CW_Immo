@@ -1,8 +1,6 @@
 import functools
-# import itertools
 import requests
 import pandas as pd
-# from io import BytesIO
 import re
 import json
 from tqdm.contrib.concurrent import thread_map
@@ -60,11 +58,6 @@ def run(rent_sale, property_type_list, provinces, districts, zips):
         if ids:
             
             get_prop_df = get_properties(ids, session)
-            
-            # get_prop_df = pd.DataFrame()
-            # for id in ids:
-            #     get_prop = get_property(id, session)
-            #     get_prop_df = pd.concat([get_prop_df, get_prop])
                 
             get_prop_df.rename(columns={'subtype':'property.subtype', 'floor':'property.location.floor', 'price':'price.mainValue',
                                         'bedroomCount': 'property.bedroomCount', 'surface': 'property.netHabitableSurface'}, inplace=True)
