@@ -2,18 +2,15 @@ import pandas as pd
 import streamlit as st
 from io import BytesIO
 import immoweb_scraper
-import immoweb_scraper_copy
 import json
 from df_transform import df_transform
 
 #TO DO: PAGES LIMIT 
 
 # Home page display
-
 st.set_page_config(layout="wide", page_title="Immoweb Scraper", page_icon = 'App_Icon.png')
 
-
-# display of BeCode logo and center it (thus the colummns thing)
+# display of CW logo and center it
 col1, col2, col3 = st.columns(3)
 
 with col1:
@@ -27,7 +24,6 @@ with col3:
 st.title('Immoweb Scraper')
 
 #data selection and filters
-
 with open('search_data.json') as json_file:
     search_data = json.load(json_file)
 
@@ -59,21 +55,16 @@ if sale_rent:
         else:
             property_type = search_data['property_types_sale']
 
-    # for zip in zips:
-    #     print(zip)
-    #     print(zip[0])
-    #     zip = 'BE-'+ str(zip[0:4])
     zips_str = ','.join(zips)
     provinces_str = ','.join(provinces)
     districts_str = ','.join((districts))
-
 
     # Process and save results
     if st.button('Search'):
 
         with st.spinner('Wait for it...'):
 
-            result = immoweb_scraper_copy.run(sale_rent, property_type, provinces_str, districts_str, zips_str)
+            result = immoweb_scraper.run(sale_rent, property_type, provinces_str, districts_str, zips_str)
             result = result.drop_duplicates(subset='id')
             result.insert(1, 'url', 'https://www.immoweb.be/en/classified/' + result['id'].astype(str))
             result = df_transform(result)
@@ -99,4 +90,3 @@ hide_default_format = """
        </style>
        """
 st.markdown(hide_default_format, unsafe_allow_html=True)
-
