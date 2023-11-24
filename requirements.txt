@@ -38,6 +38,7 @@ six==1.16.0
 smmap==5.0.1
 streamlit==1.28.2
 streamlit-folium==0.16.0
+style==1.1.0
 tenacity==8.2.3
 toml==0.10.2
 toolz==0.12.0
@@ -46,6 +47,7 @@ tqdm==4.66.1
 typing_extensions==4.8.0
 tzdata==2023.3
 tzlocal==5.2
+update==0.0.1
 urllib3==2.1.0
 validators==0.22.0
 watchdog==3.0.0
