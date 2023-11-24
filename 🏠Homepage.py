@@ -4,8 +4,8 @@ from io import BytesIO
 import immoweb_scraper
 import json
 from df_transform import df_transform
-from streamlit_folium import folium_static
 import folium
+from streamlit_folium import folium_static
 
 #TO DO: PAGES LIMIT 
 
