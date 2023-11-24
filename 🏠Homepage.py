@@ -5,9 +5,9 @@ import immoweb_scraper
 import json
 from df_transform import df_transform
 import pydeck as pdk
-import folium
 import streamlit as st
 from streamlit_folium import st_folium, folium_static
+import folium
 
 #TO DO: PAGES LIMIT 
 
