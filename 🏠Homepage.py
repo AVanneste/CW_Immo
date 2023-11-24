@@ -4,7 +4,6 @@ from io import BytesIO
 import immoweb_scraper
 import json
 from df_transform import df_transform
-import streamlit as st
 from streamlit_folium import folium_static
 import folium
 
