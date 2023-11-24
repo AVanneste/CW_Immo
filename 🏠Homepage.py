@@ -4,6 +4,10 @@ from io import BytesIO
 import immoweb_scraper
 import json
 from df_transform import df_transform
+import pydeck as pdk
+import folium
+import streamlit as st
+from streamlit_folium import st_folium, folium_static
 
 #TO DO: PAGES LIMIT 
 
@@ -32,6 +36,7 @@ def format_func(option):
 
 #select boxes and display
 sale_rent = st.selectbox('Buy or Rent?', ['for-sale', 'for-rent'], index=None, placeholder='Select For Sale or For Rent option')
+
 
 if sale_rent:
     if sale_rent == 'for-rent':
@@ -82,6 +87,29 @@ if sale_rent:
                                             data=output ,
                                             file_name= 'immoweb.xlsx',
                                             mime="application/vnd.ms-excel")
+        print('results length ', len(result))
+
+        with st.spinner('Wait for it...'):
+            map_df = result[['property.location.latitude', 'property.location.longitude']]
+            map_df = result.loc[result['property.location.latitude'].notna()]
+            map_df.rename(columns={'property.location.latitude':'lat', 'property.location.longitude':'lon'}, inplace=True)
+            
+            def create_map(data):
+                m = folium.Map(location=[map_df['lat'].mean(),map_df['lon'].mean()], zoom_start=13)
+                for i, row in data.iterrows():
+                    folium.Marker([row['lat'], row['lon']], 
+                                popup=f"Link: <a href={row['url']}>Immoweb {row['id']}</a> \n Price/Rent: {row['price.mainValue']} \n Surface: {row['property.netHabitableSurface']} \n Address: {row['property.location.street']},{row['property.location.number']} \n {row['property.location.postalCode']},{row['property.location.locality']}",
+                                tooltip=f"Price/Rent: {row['price.mainValue']} \n Additional costs: {row['price.additionalValue']} \n Type: {row['property.type']}").add_to(m)
+
+                return m
+
+            
+            my_map = create_map(map_df)
+
+        # map_show = st.checkbox('Show map')
+        # if map_show:
+        
+            folium_static(my_map, width=1500, height=800)
 
 # Hide the footer
 hide_default_format = """
