@@ -2,6 +2,7 @@ import pandas as pd
 import streamlit as st
 from io import BytesIO
 import immoweb_scraper
+import immoweb_scraper_full
 import json
 from df_transform import df_transform
 import folium
@@ -87,7 +88,7 @@ if sale_rent:
                                             mime="application/vnd.ms-excel")
         print('results length ', len(result))
 
-        with st.spinner('Wait for it...'):
+        with st.spinner('Map Loading...'):
             map_df = result[['property.location.latitude', 'property.location.longitude']]
             map_df = result.loc[result['property.location.latitude'].notna()]
             map_df.rename(columns={'property.location.latitude':'lat', 'property.location.longitude':'lon'}, inplace=True)
@@ -96,7 +97,7 @@ if sale_rent:
                 m = folium.Map(location=[map_df['lat'].mean(),map_df['lon'].mean()], zoom_start=13)
                 for i, row in data.iterrows():
                     folium.Marker([row['lat'], row['lon']], 
-                                popup=f"Link: <a href={row['url']}>Immoweb {row['id']}</a> \n Price/Rent: {row['price.mainValue']} \n Surface: {row['property.netHabitableSurface']} \n Address: {row['property.location.street']},{row['property.location.number']} \n {row['property.location.postalCode']},{row['property.location.locality']}",
+                                popup=f"Link: <a href={row['url']} target='_blank'>Immoweb {row['id']}</a> \n Price/Rent: {row['price.mainValue']} \n Surface: {row['property.netHabitableSurface']} \n Address: {row['property.location.street']},{row['property.location.number']} \n {row['property.location.postalCode']},{row['property.location.locality']}",
                                 tooltip=f"Price/Rent: {row['price.mainValue']} \n Additional costs: {row['price.additionalValue']} \n Type: {row['property.type']}").add_to(m)
 
                 return m
@@ -108,6 +109,29 @@ if sale_rent:
         # if map_show:
         
             folium_static(my_map, width=1500, height=800)
+    
+    if st.button('Full Search (SLOW)'):
+
+        with st.spinner('Wait for it...'):
+
+            result = immoweb_scraper_full.run(sale_rent, property_type, provinces_str, districts_str, zips_str)
+            result = result.drop_duplicates(subset='id')
+            result.insert(1, 'url', 'https://www.immoweb.be/en/classified/' + result['id'].astype(str))
+            # result = df_transform(result)
+            
+            # if sale_rent=='for-sale':
+            #     result['MainValue/Surface'] = result['price.mainValue'].astype('Int64')/result['property.netHabitableSurface'].astype('Int64')
+            
+        st.dataframe(result)
+        
+        output = BytesIO()
+        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:  
+            result.to_excel(writer, sheet_name='Results', index=False)
+            
+        st.download_button(label='📥 Download Full Search Results',
+                                            data=output ,
+                                            file_name= 'immoweb_full.xlsx',
+                                            mime="application/vnd.ms-excel")
 
 # Hide the footer
 hide_default_format = """
