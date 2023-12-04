@@ -4,7 +4,8 @@ from io import BytesIO
 import immoweb_scraper
 import immoweb_scraper_full
 import json
-from df_transform import df_transform
+from df_transform import df_transform, new_cols
+from create_map import create_map
 import folium
 from streamlit_folium import folium_static
 
@@ -35,7 +36,6 @@ def format_func(option):
 
 #select boxes and display
 sale_rent = st.selectbox('Buy or Rent?', ['for-sale', 'for-rent'], index=None, placeholder='Select For Sale or For Rent option')
-
 
 if sale_rent:
     if sale_rent == 'for-rent':
@@ -69,69 +69,64 @@ if sale_rent:
         with st.spinner('Wait for it...'):
 
             result = immoweb_scraper.run(sale_rent, property_type, provinces_str, districts_str, zips_str)
-            result = result.drop_duplicates(subset='id')
-            result.insert(1, 'url', 'https://www.immoweb.be/en/classified/' + result['id'].astype(str))
-            result = df_transform(result)
-            
-            if sale_rent=='for-sale':
-                result['MainValue/Surface'] = result['price.mainValue'].astype('Int64')/result['property.netHabitableSurface'].astype('Int64')
-            
-        st.dataframe(result)
-        
-        output = BytesIO()
-        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:  
-            result.to_excel(writer, sheet_name='Results', index=False)
-            
-        st.download_button(label='📥 Download Search Results',
-                                            data=output ,
-                                            file_name= 'immoweb.xlsx',
-                                            mime="application/vnd.ms-excel")
-        print('results length ', len(result))
+            if result.empty:
+                st.markdown('No results found')
+            else:
+                result = new_cols(result)
+                result = df_transform(result)
 
-        with st.spinner('Map Loading...'):
-            map_df = result[['property.location.latitude', 'property.location.longitude']]
-            map_df = result.loc[result['property.location.latitude'].notna()]
-            map_df.rename(columns={'property.location.latitude':'lat', 'property.location.longitude':'lon'}, inplace=True)
-            
-            def create_map(data):
-                m = folium.Map(location=[map_df['lat'].mean(),map_df['lon'].mean()], zoom_start=13)
-                for i, row in data.iterrows():
-                    folium.Marker([row['lat'], row['lon']], 
-                                popup=f"Link: <a href={row['url']} target='_blank'>Immoweb {row['id']}</a> \n Price/Rent: {row['price.mainValue']} \n Surface: {row['property.netHabitableSurface']} \n Address: {row['property.location.street']},{row['property.location.number']} \n {row['property.location.postalCode']},{row['property.location.locality']}",
-                                tooltip=f"Price/Rent: {row['price.mainValue']} \n Additional costs: {row['price.additionalValue']} \n Type: {row['property.type']}").add_to(m)
+                st.dataframe(result, column_config={"url": st.column_config.LinkColumn("url")})
+                
+                output = BytesIO()
+                with pd.ExcelWriter(output, engine='xlsxwriter') as writer:  
+                    result.to_excel(writer, sheet_name='Results', index=False)
+                    
+                st.download_button(label='📥 Download Search Results',
+                                                    data=output ,
+                                                    file_name= 'immoweb.xlsx',
+                                                    mime="application/vnd.ms-excel")
 
-                return m
+                with st.spinner('Map Loading...'):
 
-            
-            my_map = create_map(map_df)
+                    my_map = create_map(result)
 
-        # map_show = st.checkbox('Show map')
-        # if map_show:
-        
-            folium_static(my_map, width=1500, height=800)
+                # map_show = st.checkbox('Show map')
+                # if map_show:
+                    try:
+                        folium_static(my_map, width=1500, height=800)
+                    except:
+                        st.markdown('No result to show on map')
     
     if st.button('Full Search (SLOW)'):
 
         with st.spinner('Wait for it...'):
 
             result = immoweb_scraper_full.run(sale_rent, property_type, provinces_str, districts_str, zips_str)
-            result = result.drop_duplicates(subset='id')
-            result.insert(1, 'url', 'https://www.immoweb.be/en/classified/' + result['id'].astype(str))
-            # result = df_transform(result)
-            
-            # if sale_rent=='for-sale':
-            #     result['MainValue/Surface'] = result['price.mainValue'].astype('Int64')/result['property.netHabitableSurface'].astype('Int64')
-            
-        st.dataframe(result)
-        
-        output = BytesIO()
-        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:  
-            result.to_excel(writer, sheet_name='Results', index=False)
-            
-        st.download_button(label='📥 Download Full Search Results',
-                                            data=output ,
-                                            file_name= 'immoweb_full.xlsx',
-                                            mime="application/vnd.ms-excel")
+            if result.empty:
+                st.markdown('No results found')
+            else:
+                result = new_cols(result)
+                
+                st.dataframe(result, column_config={"url": st.column_config.LinkColumn("url")})
+                
+                output = BytesIO()
+                with pd.ExcelWriter(output, engine='xlsxwriter') as writer:  
+                    result.to_excel(writer, sheet_name='Results', index=False)
+                    
+                st.download_button(label='📥 Download Full Search Results',
+                                                    data=output ,
+                                                    file_name= 'immoweb_full.xlsx',
+                                                    mime="application/vnd.ms-excel")
+                
+                with st.spinner('Map Loading...'):
+                    my_map = create_map(result)
+
+                # map_show = st.checkbox('Show map')
+                # if map_show:
+                    try:
+                        folium_static(my_map, width=1500, height=800)
+                    except:
+                        st.markdown('No result to show on map')
 
 # Hide the footer
 hide_default_format = """

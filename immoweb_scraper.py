@@ -35,7 +35,7 @@ def get_property(id, session):
                 item['cluster.projectInfo.groupId'] = group_id
                 item['primaryEnergyConsumptionPerSqm'] = energy_cons
                 items.append(item)
-        return pd.DataFrame(items)        
+        return pd.DataFrame(items)
     except:
         print("no html content found")
         return
@@ -48,21 +48,21 @@ def run(rent_sale, property_type_list, provinces, districts, zips):
 
     with requests.Session() as session:
         
-
         for property_type in property_type_list:
             
             prop_data = pd.concat([prop_data,get_data_for_category(property_type, rent_sale, provinces, districts, zips, session)])
         
-        ids = set(prop_data['id'].loc[prop_data['price.type']=='group_sale'].to_list())
-        ids = list(ids)
-        if ids:
-            
-            get_prop_df = get_properties(ids, session)
+        if not prop_data.empty:
+            ids = set(prop_data['id'].loc[prop_data['price.type']=='group_sale'].to_list())
+            ids = list(ids)
+            if ids:
                 
-            get_prop_df.rename(columns={'subtype':'property.subtype', 'floor':'property.location.floor', 'price':'price.mainValue',
-                                        'bedroomCount': 'property.bedroomCount', 'surface': 'property.netHabitableSurface'}, inplace=True)
-            get_prop_df = get_prop_df.drop(['realEstateProjectPhase'], axis=1)
-            prop_data = pd.concat([prop_data, get_prop_df], axis=0, ignore_index=True)
-            prop_data = copy_group_values(prop_data, get_prop_df)
+                get_prop_df = get_properties(ids, session)
+                    
+                get_prop_df.rename(columns={'subtype':'property.subtype', 'floor':'property.location.floor', 'price':'price.mainValue',
+                                            'bedroomCount': 'property.bedroomCount', 'surface': 'property.netHabitableSurface'}, inplace=True)
+                get_prop_df = get_prop_df.drop(['realEstateProjectPhase'], axis=1)
+                prop_data = pd.concat([prop_data, get_prop_df], axis=0, ignore_index=True)
+                prop_data = copy_group_values(prop_data, get_prop_df)
 
     return prop_data

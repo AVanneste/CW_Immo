@@ -1,9 +1,7 @@
 import pandas as pd
 
 def df_transform(df):
-    
-    # df['url'] = 'https://www.immoweb.be/en/classified/' + df['id'].astype(str)
-    
+
     df_cols = df.columns.to_list()
     
     drop_cols = ['customerLogoUrl', 'customerName', 'priceType', 'isBookmarked', 'has360Tour', 'hasVirtualTour', 
@@ -29,8 +27,7 @@ def df_transform(df):
 def copy_group_values(df_group, df_units):
     
     for id in df_units['cluster.projectInfo.groupId'].unique().tolist():
-        print(id)
-        print(df_group['property.location.country'].loc[df_group['id']==id])
+
         df_group.loc[df_group['cluster.projectInfo.groupId']==id, 'property.location.country'] = df_group['property.location.country'].loc[df_group['id']==id].values[0]
         df_group.loc[df_group['cluster.projectInfo.groupId']==id, 'property.location.region'] = df_group['property.location.region'].loc[df_group['id']==id].values[0]
         df_group.loc[df_group['cluster.projectInfo.groupId']==id, 'property.location.province'] = df_group['property.location.province'].loc[df_group['id']==id].values[0]
@@ -47,3 +44,15 @@ def copy_group_values(df_group, df_units):
         df_group.loc[df_group['cluster.projectInfo.groupId']==id, 'property.location.placeName'] = df_group['property.location.placeName'].loc[df_group['id']==id].values[0]
         
     return df_group
+
+def new_cols(df):
+    df = df.drop_duplicates(subset='id')
+    df.insert(1, 'url', 'https://www.immoweb.be/en/classified/' + df['id'].astype(str))
+    try:
+        col = df.pop('cluster.projectInfo.groupId')
+        df.insert(2, col.name, col)
+        df.insert(3, 'MainValue/Surface', df['price.mainValue'].astype('Int64')/df['property.netHabitableSurface'].astype('Int64'))
+    except:
+        df.insert(2, 'MainValue/Surface', df['price.mainValue'].astype('Int64')/df['property.netHabitableSurface'].astype('Int64'))
+    
+    return df
