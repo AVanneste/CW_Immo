@@ -11,7 +11,7 @@ def get_ids_from_search_results(i, property_type, rent_sale, provinces, district
     return [result['id'] for result in session.get(api_url).json()['results']]
 
 def get_ids_for_category(property_type, rent_sale, provinces, districts, zips, session):
-    return set(itertools.chain.from_iterable(thread_map(functools.partial(get_ids_from_search_results, property_type=property_type, rent_sale=rent_sale, provinces=provinces, districts=districts, zips=zips, session=session), range(1, 100))))
+    return set(itertools.chain.from_iterable(thread_map(functools.partial(get_ids_from_search_results, property_type=property_type, rent_sale=rent_sale, provinces=provinces, districts=districts, zips=zips, session=session), range(1, 334))))
 
 
 def get_property(id, session):

@@ -56,3 +56,16 @@ def new_cols(df):
         df.insert(2, 'MainValue/Surface', df['price.mainValue'].astype('Int64')/df['property.netHabitableSurface'].astype('Int64'))
     
     return df
+
+def transform_immotop(df):
+    try:
+        df.rename(columns={'realEstate.id':'id'}, inplace=True)
+    except:
+        None
+    try:
+        df.rename(columns={'typology.name':'typologyValue'}, inplace=True)
+        
+    except:
+        None
+    df.insert(1, 'url', 'https://www.immotop.lu/en/annonces/' + df['id'].astype(str))
+    return df

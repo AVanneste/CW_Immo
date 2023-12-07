@@ -1,18 +1,18 @@
 import pandas as pd
 import streamlit as st
 from io import BytesIO
-import immoweb_scraper
-import immoweb_scraper_full
+import scripts.immoweb_scraper
+import scripts.immoweb_scraper_full
 import json
-from df_transform import df_transform, new_cols
-from create_map import create_map
+from scripts.df_transform import df_transform, new_cols
+from scripts.create_map import create_map
 import folium
 from streamlit_folium import folium_static
 
 #TO DO: PAGES LIMIT 
 
 # Home page display
-st.set_page_config(layout="wide", page_title="Immoweb Scraper", page_icon = 'App_Icon.png')
+st.set_page_config(layout="wide", page_title="Immoweb Scraper", page_icon = 'data/CW_icon.png')
 
 # display of CW logo and center it
 col1, col2, col3 = st.columns(3)
@@ -20,7 +20,7 @@ col1, col2, col3 = st.columns(3)
 with col1:
     st.write(' ')
 with col2:
-    st.image('CW.png', width=300)
+    st.image('data/CW_banner1.png', width=600)
 with col3:
     st.write(' ')
 
@@ -28,7 +28,7 @@ with col3:
 st.title('Immoweb Scraper')
 
 #data selection and filters
-with open('search_data.json') as json_file:
+with open('data/search_data.json') as json_file:
     search_data = json.load(json_file)
 
 def format_func(option):
@@ -68,7 +68,7 @@ if sale_rent:
 
         with st.spinner('Wait for it...'):
 
-            result = immoweb_scraper.run(sale_rent, property_type, provinces_str, districts_str, zips_str)
+            result = scripts.immoweb_scraper.run(sale_rent, property_type, provinces_str, districts_str, zips_str)
             if result.empty:
                 st.markdown('No results found')
             else:
@@ -101,7 +101,7 @@ if sale_rent:
 
         with st.spinner('Wait for it...'):
 
-            result = immoweb_scraper_full.run(sale_rent, property_type, provinces_str, districts_str, zips_str)
+            result = scripts.immoweb_scraper_full.run(sale_rent, property_type, provinces_str, districts_str, zips_str)
             if result.empty:
                 st.markdown('No results found')
             else:
