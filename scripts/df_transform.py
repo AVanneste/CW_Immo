@@ -69,3 +69,8 @@ def transform_immotop(df):
         None
     df.insert(1, 'url', 'https://www.immotop.lu/en/annonces/' + df['id'].astype(str))
     return df
+
+def transform_athome(df):
+    df = df.drop_duplicates(subset='id')
+    df.insert(1, 'url', 'https://www.athome.lu/id-' + df['id'].astype(str) + '.html')
+    return df

@@ -7,7 +7,6 @@ def create_map(data):
         return None
     else:
         map_df.rename(columns={'property.location.latitude':'lat', 'property.location.longitude':'lon'}, inplace=True)
-        # print(map_df)
         m = folium.Map(location=[map_df['lat'].mean(),map_df['lon'].mean()], zoom_start=13)
         for i, row in map_df.iterrows():
             folium.Marker([row['lat'], row['lon']], 
@@ -17,17 +16,29 @@ def create_map(data):
         return m
     
 def create_map_immotop(data):
-    # map_df = data[['property.location.latitude', 'property.location.longitude']]
     map_df = data.loc[data['location.latitude'].notna()]
     if map_df.empty:
         return None
     else:
         map_df.rename(columns={'location.latitude':'lat', 'location.longitude':'lon'}, inplace=True)
-        # print(map_df)
         m = folium.Map(location=[map_df['lat'].mean(),map_df['lon'].mean()], zoom_start=13)
         for i, row in map_df.iterrows():
             folium.Marker([row['lat'], row['lon']], 
                         popup=f"Link: <a href=Immotop {row['url']} target='_blank'>{row['id']}</a> \n Price/Rent: {row['price.value']} \n Surface: {row['surface']} \n City: {row['location.city']}",
                         tooltip=f"Price/Rent: {row['price.value']} \n Type: {row['typologyValue']}").add_to(m)
+
+        return m
+
+def create_map_athome(data):
+    map_df = data.loc[data['completeGeoInfos.pin.lat'].notna()]
+    if map_df.empty:
+        return None
+    else:
+        map_df.rename(columns={'completeGeoInfos.pin.lat':'lat', 'completeGeoInfos.pin.lon':'lon'}, inplace=True)
+        m = folium.Map(location=[map_df['lat'].astype(float).mean(),map_df['lon'].astype(float).mean()], zoom_start=13)
+        for i, row in map_df.iterrows():
+            folium.Marker([row['lat'], row['lon']], 
+                        popup=f"Link: <a href=atHome {row['url']} target='_blank'>{row['id']}</a> \n Price/Rent: {row['price']} \n Surface: {row['property.characteristic.property_surface']} \n City: {row['completeGeoInfos.levels.L9']}",
+                        tooltip=f"Price/Rent: {row['price']} \n Type: {row['immotype']}").add_to(m)
 
         return m

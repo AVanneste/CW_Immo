@@ -11,6 +11,7 @@ import folium
 from streamlit_folium import folium_static
 
 #TO DO: clean columns in results dfs
+# Add added dates
 
 # Home page display
 st.set_page_config(layout="wide", page_title="Immotop Scraper", page_icon = 'data/CW_icon.png')
