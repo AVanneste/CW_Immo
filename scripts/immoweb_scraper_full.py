@@ -4,6 +4,7 @@ import itertools
 import pandas as pd
 import re
 import json
+import math
 from tqdm.contrib.concurrent import thread_map
 
 def get_ids_from_search_results(i, property_type, rent_sale, provinces, districts, zips, session):
@@ -11,7 +12,10 @@ def get_ids_from_search_results(i, property_type, rent_sale, provinces, district
     return [result['id'] for result in session.get(api_url).json()['results']]
 
 def get_ids_for_category(property_type, rent_sale, provinces, districts, zips, session):
-    return set(itertools.chain.from_iterable(thread_map(functools.partial(get_ids_from_search_results, property_type=property_type, rent_sale=rent_sale, provinces=provinces, districts=districts, zips=zips, session=session), range(1, 334))))
+    api_url = f'https://www.immoweb.be/en/search-results/{property_type}/{rent_sale}?countries=BE&provinces={provinces}&districts={districts}&postalCodes={zips}&page=1&orderBy=newest'
+    total_items = session.get(api_url).json()['totalItems']
+    pages_limit = math.ceil(int(total_items)/20)
+    return set(itertools.chain.from_iterable(thread_map(functools.partial(get_ids_from_search_results, property_type=property_type, rent_sale=rent_sale, provinces=provinces, districts=districts, zips=zips, session=session), range(1, pages_limit+1))))
 
 
 def get_property(id, session):

@@ -3,6 +3,7 @@ import requests
 import pandas as pd
 import re
 import json
+import math
 from tqdm.contrib.concurrent import thread_map
 from scripts.df_transform import copy_group_values
 
@@ -11,7 +12,10 @@ def get_data_from_search_results(i, property_type, rent_sale, provinces, distric
     return pd.json_normalize(session.get(api_url).json()['results'])
 
 def get_data_for_category(property_type, rent_sale, provinces, districts, zips, session):
-    return pd.concat(thread_map(functools.partial(get_data_from_search_results, property_type=property_type, rent_sale=rent_sale, provinces=provinces, districts=districts, zips=zips, session=session), range(1, 334)))
+    api_url = f'https://www.immoweb.be/en/search-results/{property_type}/{rent_sale}?countries=BE&provinces={provinces}&districts={districts}&postalCodes={zips}&page=1&orderBy=newest'
+    total_items = session.get(api_url).json()['totalItems']
+    pages_limit = math.ceil(int(total_items)/20)
+    return pd.concat(thread_map(functools.partial(get_data_from_search_results, property_type=property_type, rent_sale=rent_sale, provinces=provinces, districts=districts, zips=zips, session=session), range(1, pages_limit+1)))
 
 def get_property(id, session):
     property_url = f"https://www.immoweb.be/en/classified/{id}"
