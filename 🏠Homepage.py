@@ -4,7 +4,7 @@ from io import BytesIO
 import scripts.immoweb_scraper
 import scripts.immoweb_scraper_full
 import json
-from scripts.df_transform import df_transform, new_cols
+from scripts.df_transform import df_transform, new_cols, annechien_results
 from scripts.create_map import create_map
 import folium
 from streamlit_folium import folium_static
@@ -106,8 +106,12 @@ if sale_rent:
                 st.markdown('No results found')
             else:
                 result = new_cols(result)
-                
+                # result_annechien = result[['url', 'property.bedroomCount', 'property.location.locality', 'property.location.postalCode', 'property.location.street', 'property.location.number', 'property.location.floor',
+                #                            'property.netHabitableSurface', 'property.building.condition', 'property.terraceSurface', 'transaction.certificates.epcScore', 'transaction.rental.monthlyRentalPrice']]
+                result_annechien = annechien_results(result)
                 st.dataframe(result, column_config={"url": st.column_config.LinkColumn("url")})
+                st.markdown('Annechien Dataframe:')
+                st.dataframe(result_annechien, column_config={"url": st.column_config.LinkColumn("url")})
                 
                 output = BytesIO()
                 with pd.ExcelWriter(output, engine='xlsxwriter') as writer:  
@@ -116,6 +120,15 @@ if sale_rent:
                 st.download_button(label='📥 Download Full Search Results',
                                                     data=output ,
                                                     file_name= 'immoweb_full.xlsx',
+                                                    mime="application/vnd.ms-excel")
+                
+                output_annechien = BytesIO()
+                with pd.ExcelWriter(output_annechien, engine='xlsxwriter') as writer_a:  
+                    result_annechien.to_excel(writer_a, sheet_name='Results', index=False)
+                    
+                st.download_button(label='📥 Download Annechien Search Results',
+                                                    data=output_annechien ,
+                                                    file_name= 'immoweb_annechien.xlsx',
                                                     mime="application/vnd.ms-excel")
                 
                 with st.spinner('Map Loading...'):

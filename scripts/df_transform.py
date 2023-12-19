@@ -24,6 +24,16 @@ def df_transform(df):
     
     return df
 
+def annechien_results(df):
+    
+    df_cols = df.columns.to_list()
+    annechien_columns = ['url', 'property.bedroomCount', 'property.location.locality', 'property.location.postalCode', 'property.location.street', 'property.location.number', 'property.location.floor',
+                                           'property.netHabitableSurface', 'property.building.condition', 'property.terraceSurface', 'transaction.certificates.epcScore', 'transaction.rental.monthlyRentalPrice']
+    to_keep = [x for x in df_cols if x in annechien_columns]
+    df = df[to_keep]
+    
+    return df
+
 def copy_group_values(df_group, df_units):
     
     for id in df_units['cluster.projectInfo.groupId'].unique().tolist():
