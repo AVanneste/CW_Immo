@@ -78,7 +78,7 @@ if sale_rent:
                 st.dataframe(result, column_config={"url": st.column_config.LinkColumn("url")})
                 
                 output = BytesIO()
-                with pd.ExcelWriter(output, engine='xlsxwriter') as writer:  
+                with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
                     result.to_excel(writer, sheet_name='Results', index=False)
                     
                 st.download_button(label='📥 Download Search Results',
