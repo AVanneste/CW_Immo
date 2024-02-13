@@ -153,7 +153,6 @@ if sale_rent:
             my_map = create_map(st.session_state['original_dataframe'])
 
     if st.checkbox('Show map'):
-    # if map_show:
         try:
             folium_static(my_map, width=1500, height=800)
         except:

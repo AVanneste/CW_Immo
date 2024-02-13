@@ -15,7 +15,7 @@ def get_data_from_search_results(i, property_type, rent_sale, zone, session):
         soup = BeautifulSoup(resp.content, "html.parser")
         results = soup.find(id="__NEXT_DATA__").text
         json_data = json.loads(results)
-        proj_list = json_data['props']['pageProps']['dehydratedState']['queries'][0]['state']['data']['pages'][0]['results']
+        proj_list = json_data['props']['pageProps']['dehydratedState']['queries'][0]['state']['data']['results']
         proj_prop_list = []
         for i in proj_list:
             projectId = i['realEstate']['id']
@@ -36,7 +36,7 @@ def get_data_from_search_results(i, property_type, rent_sale, zone, session):
         results = soup.find(id="__NEXT_DATA__").text
         json_data = json.loads(results)
         # prop_list = [x['realEstate']['properties'] for x in json_data['props']['pageProps']['dehydratedState']['queries'][0]['state']['data']['pages'][0]['results']]
-        prop_list = [dict(x['realEstate']['properties'][0], id=x['realEstate']['id']) for x in json_data['props']['pageProps']['dehydratedState']['queries'][0]['state']['data']['pages'][0]['results'] if x['realEstate']['typology']['name'] != 'Project']
+        prop_list = [dict(x['realEstate']['properties'][0], id=x['realEstate']['id']) for x in json_data['props']['pageProps']['dehydratedState']['queries'][0]['state']['data']['results'] if x['realEstate']['typology']['name'] != 'Project']
         return pd.json_normalize(prop_list)
 
 def get_data_for_category(property_type, rent_sale, zone, session):
@@ -53,27 +53,26 @@ def get_data_for_category(property_type, rent_sale, zone, session):
     print('pages limit: ', pages_limit)
     return pd.concat(thread_map(functools.partial(get_data_from_search_results, property_type=property_type, rent_sale=rent_sale, zone=zone, session=session), range(1, pages_limit+1)))
 
-
-def get_property(id, session):
-    property_url = f"https://www.immotop.lu/en/annonces/{id}"
-    try:
-        resp = session.get(property_url, timeout=5)
-    except:
-        print("resp problem")
-        return
-    try:
-        resp = requests.get(property_url)
-        soup = BeautifulSoup(resp.content, "html.parser")
-        results = soup.find(id="__NEXT_DATA__").text
-        json_data = json.loads(results)
-        return pd.json_normalize(json_data['props']['pageProps']['detailData']['realEstate']['properties'][0], max_level=3)
+# def get_property(id, session):
+#     property_url = f"https://www.immotop.lu/en/annonces/{id}"
+#     try:
+#         resp = session.get(property_url, timeout=5)
+#     except:
+#         print("resp problem")
+#         return
+#     try:
+#         resp = requests.get(property_url)
+#         soup = BeautifulSoup(resp.content, "html.parser")
+#         results = soup.find(id="__NEXT_DATA__").text
+#         json_data = json.loads(results)
+#         return pd.json_normalize(json_data['props']['pageProps']['detailData']['realEstate']['properties'][0], max_level=3)
     
-    except:
-        print("no html content found")
-        return
+#     except:
+#         print("no html content found")
+#         return
 
-def get_properties(ids, session, max_workers=64):
-    return pd.concat(thread_map(functools.partial(get_property, session=session), ids, max_workers=max_workers))
+# def get_properties(ids, session, max_workers=64):
+#     return pd.concat(thread_map(functools.partial(get_property, session=session), ids, max_workers=max_workers))
 
 def run(rent_sale, property_type_list, zone):
     prop_data = pd.DataFrame()
