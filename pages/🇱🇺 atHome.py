@@ -22,7 +22,7 @@ with col1:
     st.write(' ')
 with col2:
     st.image('data/CW_banner1.png', width=600)
-    st.image('data/under_maint.png', width=600)
+    st.image('data/under_maint.jpg', width=600)
 with col3:
     st.write(' ')
 
