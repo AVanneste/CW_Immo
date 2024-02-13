@@ -9,6 +9,8 @@ from scripts.create_map import create_map
 from streamlit_folium import folium_static
 from streamlit_sortables import sort_items
 
+# TO DO: Fix for empty results
+
 # Home page display
 st.set_page_config(layout="wide", page_title="Immoweb Scraper", page_icon = 'data/CW_icon.png')
 
