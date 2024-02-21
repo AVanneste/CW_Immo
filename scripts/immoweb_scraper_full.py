@@ -119,6 +119,8 @@ def run(rent_sale, property_type_list, provinces='', districts='', zips=''):
         if ids:
             prop_data = get_properties(ids, session)
             # group_ids = prop_data['id'].loc[prop_data['property.type'] in ['APARTMENT_GROUP', 'HOUSE_GROUP']].to_list()
+        else:
+            return pd.DataFrame()
         if group_units:
             for key in group_units.keys():
                 group_data = get_properties(group_units[key], session)

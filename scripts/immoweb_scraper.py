@@ -14,6 +14,8 @@ def get_data_from_search_results(i, property_type, rent_sale, provinces, distric
 def get_data_for_category(property_type, rent_sale, provinces, districts, zips, session):
     api_url = f'https://www.immoweb.be/en/search-results/{property_type}/{rent_sale}?countries=BE&provinces={provinces}&districts={districts}&postalCodes={zips}&page=1&orderBy=newest'
     total_items = session.get(api_url).json()['totalItems']
+    if total_items == 0:
+        return pd.DataFrame()
     pages_limit = math.ceil(int(total_items)/20)
     return pd.concat(thread_map(functools.partial(get_data_from_search_results, property_type=property_type, rent_sale=rent_sale, provinces=provinces, districts=districts, zips=zips, session=session), range(1, pages_limit+1)))
 
@@ -60,7 +62,6 @@ def run(rent_sale, property_type_list, provinces, districts, zips):
             ids = set(prop_data['id'].loc[prop_data['price.type']=='group_sale'].to_list())
             ids = list(ids)
             if ids:
-                
                 get_prop_df = get_properties(ids, session)
                     
                 get_prop_df.rename(columns={'subtype':'property.subtype', 'floor':'property.location.floor', 'price':'price.mainValue',
@@ -68,5 +69,6 @@ def run(rent_sale, property_type_list, provinces, districts, zips):
                 get_prop_df = get_prop_df.drop(['realEstateProjectPhase'], axis=1)
                 prop_data = pd.concat([prop_data, get_prop_df], axis=0, ignore_index=True)
                 prop_data = copy_group_values(prop_data, get_prop_df)
-
+            else:
+                return pd.DataFrame()
     return prop_data

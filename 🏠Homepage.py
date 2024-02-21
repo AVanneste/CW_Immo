@@ -48,6 +48,10 @@ def reset_state(button1, button2):
     st.session_state['columns'] = []
 
 #select boxes and display
+pre_selected_columns_rent = ['property.location.locality', 'property.location.street', 'property.location.number', 'property.location.propertyName', 'property.location.floor', 'property.building.condition', 'property.bedroomCount',
+                             'property.netHabitableSurface', 'property.terraceSurface', 'property.gardenSurface', 'transaction.rental.monthlyRentalPrice', 'transaction.rental.isFurnished', 'property.parkingCountIndoor', 'property.parkingCountOutdoor']
+pre_selected_columns_sale = ['property.location.locality', 'property.location.street', 'property.location.number', 'property.location.propertyName', 'property.building.condition', 'property.location.floor', 'property.bedroomCount',
+                             'property.netHabitableSurface', 'property.terraceSurface', 'property.gardenSurface', 'transaction.sale.price', 'property.parkingCountIndoor', 'property.parkingCountOutdoor']
 sale_rent = st.selectbox('Buy or Rent?', ['for-sale', 'for-rent'], index=None, placeholder='Select For Sale or For Rent option')
 
 if sale_rent:
@@ -87,31 +91,31 @@ if sale_rent:
                     
                     st.session_state['original_dataframe'] = result
         
-        st.session_state['columns'] = list(st.session_state['original_dataframe'].columns)
-        
-        original_items = [{'header': 'Pick your columns and their order (drag and drop)',  'items': []}, {'header': 'Original columns', 'items': st.session_state['columns']}]
-        
-        sorted_items = sort_items(original_items, multi_containers=True)
+                    st.session_state['columns'] = list(st.session_state['original_dataframe'].columns)
+                    
+                    original_items = [{'header': 'Pick your columns and their order (drag and drop)',  'items': []}, {'header': 'Original columns', 'items': st.session_state['columns']}]
+                    
+                    sorted_items = sort_items(original_items, multi_containers=True)
 
-        if sorted_items[0]['items'] == []:
-            st.session_state['dataframe'] = st.session_state['original_dataframe'][sorted_items[1]['items']]
-        else:
-            st.session_state['dataframe'] = st.session_state['original_dataframe'][sorted_items[0]['items']]
-        
-        st.dataframe(st.session_state['dataframe'], column_config={"url": st.column_config.LinkColumn("url")})
-        
-        output = BytesIO()
-        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-            st.session_state['dataframe'].to_excel(writer, sheet_name='Results', index=False)
-            
-        st.download_button(label='📥 Download Search Results',
-                                            data=output ,
-                                            file_name= 'immoweb.xlsx',
-                                            mime="application/vnd.ms-excel")
+                    if sorted_items[0]['items'] == []:
+                        st.session_state['dataframe'] = st.session_state['original_dataframe'][sorted_items[1]['items']]
+                    else:
+                        st.session_state['dataframe'] = st.session_state['original_dataframe'][sorted_items[0]['items']]
+                    
+                    st.dataframe(st.session_state['dataframe'], column_config={"url": st.column_config.LinkColumn("url")})
+                    
+                    output = BytesIO()
+                    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+                        st.session_state['dataframe'].to_excel(writer, sheet_name='Results', index=False)
+                        
+                    st.download_button(label='📥 Download Search Results',
+                                                        data=output ,
+                                                        file_name= 'immoweb.xlsx',
+                                                        mime="application/vnd.ms-excel")
 
-        with st.spinner('Map Loading...'):
+                    with st.spinner('Map Loading...'):
 
-            my_map = create_map(st.session_state['original_dataframe'])
+                        my_map = create_map(st.session_state['original_dataframe'])
     
     st.button('Full Search (SLOW)', on_click=reset_state, args=['full', 'normal'])
 
@@ -127,30 +131,35 @@ if sale_rent:
 
                     st.session_state['original_dataframe'] = result
         
-        st.session_state['columns'] = list(st.session_state['original_dataframe'].columns)
-        
-        original_items = [{'header': 'Pick your columns and their order (drag and drop)',  'items': []}, {'header': 'Original columns', 'items': st.session_state['columns']}]
-        
-        sorted_items = sort_items(original_items, multi_containers=True)
+                    if sale_rent =='for-rent':
+                        st.session_state['columns'] = [x for x in list(st.session_state['original_dataframe'].columns) if x not in pre_selected_columns_rent]
+                        picked_columns = pre_selected_columns_rent
+                    else:
+                        st.session_state['columns'] = [x for x in list(st.session_state['original_dataframe'].columns) if x not in pre_selected_columns_sale]
+                        picked_columns = pre_selected_columns_sale
+                    original_items = [{'header': 'Pick your columns and their order (drag and drop)',  'items': picked_columns},
+                                    {'header': 'Original columns (drag and drop to or from other box to add/remove columns in file to download)', 'items': st.session_state['columns']}]
+                    
+                    sorted_items = sort_items(original_items, multi_containers=True)
 
-        if sorted_items[0]['items'] == []:
-            st.session_state['dataframe'] = st.session_state['original_dataframe'][sorted_items[1]['items']]
-        else:
-            st.session_state['dataframe'] = st.session_state['original_dataframe'][sorted_items[0]['items']]
-        
-        st.dataframe(st.session_state['dataframe'], column_config={"url": st.column_config.LinkColumn("url")})
+                    if sorted_items[0]['items'] == []:
+                        st.session_state['dataframe'] = st.session_state['original_dataframe'][sorted_items[1]['items']]
+                    else:
+                        st.session_state['dataframe'] = st.session_state['original_dataframe'][sorted_items[0]['items']]
                     
-        output = BytesIO()
-        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:  
-            st.session_state['dataframe'].to_excel(writer, sheet_name='Results', index=False)
-            
-        st.download_button(label='📥 Download Full Search Results',
-                                            data=output ,
-                                            file_name= 'immoweb_full.xlsx',
-                                            mime="application/vnd.ms-excel")
-                    
-        with st.spinner('Map Loading...'):
-            my_map = create_map(st.session_state['original_dataframe'])
+                    st.dataframe(st.session_state['dataframe'], column_config={"url": st.column_config.LinkColumn("url")})
+                                
+                    output = BytesIO()
+                    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:  
+                        st.session_state['dataframe'].to_excel(writer, sheet_name='Results', index=False)
+                        
+                    st.download_button(label='📥 Download Full Search Results',
+                                                        data=output ,
+                                                        file_name= 'immoweb_full.xlsx',
+                                                        mime="application/vnd.ms-excel")
+                                
+                    with st.spinner('Map Loading...'):
+                        my_map = create_map(st.session_state['original_dataframe'])
 
     if st.checkbox('Show map'):
         try:
