@@ -67,42 +67,6 @@ def get_property(id, session):
         print("no html content found, id: ", id)
         return
 
-# def get_group_properties(id, session):
-#     property_url = f"https://www.immoweb.be/en/classified/{id}"
-#     for attempt in range(3):
-#         try:
-#             resp = session.get(property_url, timeout=15)
-#             break
-#         except requests.exceptions.ChunkedEncodingError as e:
-#             time.sleep(1)
-#             print(e)
-#     else:
-#         print("resp problem, id : ", id)
-#         return
-#     try:
-#         re_text = re.search(r"window.classified = (\{.*\})", resp.text).group(1)
-#         # soup = BeautifulSoup(resp.content, "html.parser")
-#         # re_text = soup.find('script', type='text/javascript').contents[0][33:-10]
-#         json_result = json.loads(re_text)
-#         json_keys = ['property', 'publication', 'transaction', 'price']
-#         json_dict = {key: json_result[key] for key in json_keys}
-#         prop_dict = {'id':id}
-#         prop_dict.update(json_dict)
-#         prop_df = pd.json_normalize(prop_dict, max_level=2)
-#         prop_df.insert(1, 'cluster.projectInfo.groupId', id)
-#         units_list = json_result['cluster']['units'][0]['items']
-#         items_id = []
-#         for unit in units_list:
-#             items_id.append(unit['id'])
-#         cluster_df = pd.DataFrame()
-#         cluster_df = pd.concat([cluster_df, get_properties(items_id, session)])
-#         cluster_df['cluster.projectInfo.groupId'] = id
-#         prop_df = pd.concat([prop_df, cluster_df])
-#         return prop_df 
-#     except:
-#         print("no html content found, id: ", id)
-#         return
-
 def get_properties(ids, session, max_workers=64):
     return pd.concat(thread_map(functools.partial(get_property, session=session), ids, max_workers=max_workers))
 
@@ -128,13 +92,3 @@ def run(rent_sale, property_type_list, provinces='', districts='', zips=''):
                 prop_data = pd.concat([prop_data, group_data], axis=0, ignore_index=True)
                 
         return prop_data
-
-# property_types_rent = ["apartment", "house", "garage", "office", "business", "industry", "land", "other"]
-# property_types_sale = [ "apartment", "house", "new-real-estate-projects", "garage", "office", "business", "industry", "land", "tenement", "other"]
-# provinces = ["LIEGE", "HAINAUT", "LUXEMBOURG", "FLEMISH_BRABANT", "WALLOON_BRABANT", "EAST_FLANDERS", "WEST_FLANDERS", "LIMBURG", "ANTWERP", "BRUSSELS", "NAMUR"]
-
-# results_rent = run(rent_sale='for-rent', property_type_list=property_types_rent)#, provinces=provinces)
-# results_rent.to_excel('immoweb_full_rent.xlsx', index=False)
-
-# results_sale = run(rent_sale='for-sale', property_type_list=property_types_sale)#, provinces=provinces)
-# results_sale.to_excel('immoweb_full_sale.xlsx', index=False)

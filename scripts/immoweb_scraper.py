@@ -69,6 +69,5 @@ def run(rent_sale, property_type_list, provinces, districts, zips):
                 get_prop_df = get_prop_df.drop(['realEstateProjectPhase'], axis=1)
                 prop_data = pd.concat([prop_data, get_prop_df], axis=0, ignore_index=True)
                 prop_data = copy_group_values(prop_data, get_prop_df)
-            else:
-                return pd.DataFrame()
+                
     return prop_data
