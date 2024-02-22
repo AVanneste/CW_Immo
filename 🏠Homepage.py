@@ -88,7 +88,6 @@ if sale_rent:
                 else:
                     result = new_cols(result)
                     result = df_transform(result)
-                    
                     st.session_state['original_dataframe'] = result
                     
         if not st.session_state['original_dataframe'].empty:
@@ -129,8 +128,8 @@ if sale_rent:
                     st.markdown('No results found')
                 else:
                     result = new_cols(result)
-
                     st.session_state['original_dataframe'] = result
+
         if not st.session_state['original_dataframe'].empty:
             if sale_rent =='for-rent':
                 st.session_state['columns'] = [x for x in list(st.session_state['original_dataframe'].columns) if x not in pre_selected_columns_rent]
