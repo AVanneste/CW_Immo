@@ -40,9 +40,9 @@ with open('data/search_data.json') as json_file:
 def format_func(option):
     return search_data['search_fields'][option]
 
-def reset_state(button1, button2):
-    st.session_state['search_click'][button1] = True
-    st.session_state['search_click'][button2] = False
+def reset_state(normal, full):
+    st.session_state['search_click']['normal'] = normal
+    st.session_state['search_click']['full'] = full
     st.session_state['original_dataframe'] = pd.DataFrame()
     st.session_state['dataframe'] = pd.DataFrame()
     st.session_state['columns'] = []
@@ -52,7 +52,8 @@ pre_selected_columns_rent = ['property.location.locality', 'property.location.st
                              'property.netHabitableSurface', 'property.terraceSurface', 'property.gardenSurface', 'transaction.rental.monthlyRentalPrice', 'transaction.rental.isFurnished', 'property.parkingCountIndoor', 'property.parkingCountOutdoor']
 pre_selected_columns_sale = ['property.location.locality', 'property.location.street', 'property.location.number', 'property.location.propertyName', 'property.building.condition', 'property.location.floor', 'property.bedroomCount',
                              'property.netHabitableSurface', 'property.terraceSurface', 'property.gardenSurface', 'transaction.sale.price', 'property.parkingCountIndoor', 'property.parkingCountOutdoor']
-sale_rent = st.selectbox('Buy or Rent?', ['for-sale', 'for-rent'], index=None, placeholder='Select For Sale or For Rent option')
+
+sale_rent = st.selectbox('Buy or Rent?', ['for-sale', 'for-rent'], index=None, placeholder='Select For Sale or For Rent option', on_change=reset_state, args=[False, False])
 
 if sale_rent:
     if sale_rent == 'for-rent':
@@ -76,7 +77,7 @@ if sale_rent:
     districts_str = ','.join((districts))
 
     # Process and save results
-    st.button('Search', on_click=reset_state, args=['normal', 'full'])
+    st.button('Search', on_click=reset_state, args=[True, False])
 
     if st.session_state['search_click']['normal'] == True:
         if st.session_state['original_dataframe'].empty:
@@ -117,7 +118,7 @@ if sale_rent:
 
                 my_map = create_map(st.session_state['original_dataframe'])
     
-    st.button('Full Search (SLOW)', on_click=reset_state, args=['full', 'normal'])
+    st.button('Full Search (SLOW)', on_click=reset_state, args=[False, True])
 
     if st.session_state['search_click']['full'] == True:
         if st.session_state['original_dataframe'].empty:
