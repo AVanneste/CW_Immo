@@ -77,7 +77,7 @@ if sale_rent:
 
     # Process and save results
     st.button('Search', on_click=reset_state, args=['normal', 'full'])
-    
+
     if st.session_state['search_click']['normal'] == True:
         if st.session_state['original_dataframe'].empty:
             with st.spinner('Wait for it...'):
@@ -122,7 +122,6 @@ if sale_rent:
     if st.session_state['search_click']['full'] == True:
         if st.session_state['original_dataframe'].empty:
             with st.spinner('Wait for it...'):
-
                 result = scripts.immoweb_scraper_full.run(sale_rent, property_type, provinces_str, districts_str, zips_str)
                 if result.empty:
                     st.markdown('No results found')

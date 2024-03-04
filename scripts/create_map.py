@@ -2,7 +2,6 @@ import folium
 
 def create_map(data):
     map_df = data.loc[data['property.location.latitude'].notna()]
-    print(map_df)
     if map_df.empty:
         return None
     else:
