@@ -53,7 +53,7 @@ def run(rent_sale, property_type_list, provinces, districts, zips):
     prop_data = pd.DataFrame()
 
     with requests.Session() as session:
-        
+        session.headers.update({'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'})
         for property_type in property_type_list:
             
             prop_data = pd.concat([prop_data,get_data_for_category(property_type, rent_sale, provinces, districts, zips, session)])

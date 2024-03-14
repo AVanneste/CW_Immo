@@ -63,6 +63,7 @@ def get_properties(ids, session, max_workers=64):
 def run(rent_sale, property_type_list, provinces='', districts='', zips=''):
     ids = set()
     with requests.Session() as session:
+        session.headers.update({'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'})
         for property_type in property_type_list:
             print('prop type: ', property_type)
             ids.update(get_ids_for_category(property_type, rent_sale, provinces, districts, zips, session))
