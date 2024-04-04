@@ -55,9 +55,7 @@ def run(rent_sale, property_type_list, provinces, districts, zips):
     with requests.Session() as session:
         session.headers.update({'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'})
         for property_type in property_type_list:
-            
             prop_data = pd.concat([prop_data,get_data_for_category(property_type, rent_sale, provinces, districts, zips, session)])
-        
         if not prop_data.empty:
             ids = set(prop_data['id'].loc[prop_data['price.type']=='group_sale'].to_list())
             ids = list(ids)
@@ -69,5 +67,4 @@ def run(rent_sale, property_type_list, provinces, districts, zips):
                 get_prop_df = get_prop_df.drop(['realEstateProjectPhase'], axis=1)
                 prop_data = pd.concat([prop_data, get_prop_df], axis=0, ignore_index=True)
                 prop_data = copy_group_values(prop_data, get_prop_df)
-                
     return prop_data
