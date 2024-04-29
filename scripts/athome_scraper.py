@@ -23,7 +23,8 @@ def get_data_from_search_results(i, rent_sale, property_type, zone, session):
             item['project.id'] = groupId
             prop_list.append(item)
             for child in item['children']['data']:
-                [child.pop(key) for key in ["media", "meta", "depth", "publisher", "config", "others"]]
+                print(child.keys())
+                # [child.pop(key) for key in ["media", "meta", "depth", "publisher", "config", "others"]]
                 child['project.id'] = groupId
                 prop_list.append(child)
                 child['id'] = child['listing_id']
