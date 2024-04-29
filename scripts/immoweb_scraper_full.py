@@ -8,7 +8,7 @@ import math
 import time
 import stqdm
 import streamlit as st
-from bs4 import BeautifulSoup
+# from bs4 import BeautifulSoup
 from tqdm.contrib.concurrent import thread_map
 import concurrent.futures
 
@@ -56,12 +56,12 @@ def get_property(id, session):
         print("no html content found, id: ", id)
         return []
 
-def get_properties(ids, session, tqdm_obj, max_workers=64):
-    properties_list = []
-    properties_list.extend(thread_map(functools.partial(get_property, session=session), ids, max_workers=max_workers))
-    for item in properties_list:
-        tqdm_obj.update(1)
-    return [item for sublist in properties_list for item in sublist]
+# def get_properties(ids, session, tqdm_obj, max_workers=64):
+#     properties_list = []
+#     properties_list.extend(thread_map(functools.partial(get_property, session=session), ids, max_workers=max_workers))
+#     for item in properties_list:
+#         tqdm_obj.update(1)
+#     return [item for sublist in properties_list for item in sublist]
 
 def run(rent_sale, property_type_list, provinces='', districts='', zips=''):
     ids = set()

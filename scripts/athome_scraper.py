@@ -32,6 +32,7 @@ def get_data_from_search_results(i, rent_sale, property_type, zone, session):
                 prop_list.append(item)
         return pd.json_normalize(prop_list)
     except:
+        print("content not found")
         None
 
 def get_data_for_category(rent_sale, property_type, zone, session):
