@@ -48,9 +48,9 @@ def reset_state(normal, full):
     st.session_state['columns'] = []
 
 #select boxes and display
-pre_selected_columns_rent = ['property.location.locality', 'property.location.street', 'property.location.number', 'property.location.propertyName', 'property.location.floor', 'property.building.condition', 'property.bedroomCount',
+pre_selected_columns_rent = ['id', 'url', 'property.location.locality', 'property.location.street', 'property.location.number', 'property.location.propertyName', 'property.location.floor', 'property.building.condition', 'property.bedroomCount',
                              'property.netHabitableSurface', 'property.terraceSurface', 'property.gardenSurface', 'transaction.rental.monthlyRentalPrice', 'transaction.rental.isFurnished', 'property.parkingCountIndoor', 'property.parkingCountOutdoor']
-pre_selected_columns_sale = ['property.location.locality', 'property.location.street', 'property.location.number', 'property.location.propertyName', 'property.building.condition', 'property.location.floor', 'property.bedroomCount',
+pre_selected_columns_sale = ['id', 'url', 'property.location.locality', 'property.location.street', 'property.location.number', 'property.location.propertyName', 'property.building.condition', 'property.location.floor', 'property.bedroomCount',
                              'property.netHabitableSurface', 'property.terraceSurface', 'property.gardenSurface', 'transaction.sale.price', 'property.parkingCountIndoor', 'property.parkingCountOutdoor']
 
 sale_rent = st.selectbox('Buy or Rent?', ['for-sale', 'for-rent'], index=None, placeholder='Select For Sale or For Rent option', on_change=reset_state, args=[False, False])
