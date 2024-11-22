@@ -13,7 +13,7 @@ def get_data_from_search_results(i, rent_sale, property_type, zone, session):
     r = session.get(url)
     soup = BeautifulSoup(r.content, "html.parser")
     # try:
-    results = soup.select("script")[6].contents[0]
+    results = soup.select("script")[8].contents[0]
     athome = json.loads(results[27:-1])
     prop_list = []
     for item in athome['search']['list']:
