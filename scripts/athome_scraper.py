@@ -45,7 +45,7 @@ def get_data_for_category(rent_sale, property_type, zone, session):
     r = session.get(url)
     soup = BeautifulSoup(r.content, "html.parser")
     try:
-        results = soup.select("script")[6].contents[0]
+        results = soup.select("script")[8].contents[0]
         athome = json.loads(results[27:-1])
         max_pages = athome['search']['paginator']['totalPages']
         if max_pages==0:
