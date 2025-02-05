@@ -78,5 +78,5 @@ if uploaded_file is not None:
                     
                 st.download_button(label='📥 Download Geocoded Results',
                                                     data=output ,
-                                                    file_name= uploaded_file.name - file_ext + 'geocoded.xlsx',
+                                                    file_name= uploaded_file.name.replace(file_ext, "")+ '_geocoded.xlsx',
                                                     mime="application/vnd.ms-excel")
