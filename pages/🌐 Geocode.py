@@ -5,7 +5,18 @@ import pandas as pd
 from io import BytesIO
 from scripts.geocode import geocode_urls
 
-def check_password():
+# display of CW logo and center it
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.write(' ')
+with col2:
+    st.image('data/CW_banner1.png', width=600)
+with col3:
+    st.write(' ')
+
+
+def check_password(col=col2):
     """Returns `True` if the user had the correct password."""
 
     def password_entered():
@@ -20,13 +31,14 @@ def check_password():
     if st.session_state.get("password_correct", False):
         return True
 
-    # Show input for password.
-    st.text_input(
-        "Password", type="password", on_change=password_entered, key="password"
-    )
-    if "password_correct" in st.session_state:
-        st.error("😕 Password incorrect")
-    return False
+    with col:
+        # Show input for password.
+        st.text_input(
+            "Password", type="password", on_change=password_entered, key="password"
+        )
+        if "password_correct" in st.session_state:
+            st.error("😕 Password incorrect")
+        return False
 
 if not check_password():
     st.stop()  # Do not continue if check_password is not True.
@@ -34,6 +46,7 @@ if not check_password():
 # Main Streamlit app starts here
 uploaded_file = st.file_uploader("Upload a CSV or XLSX file", type=["xlsx", "csv"])
 st.write("Note: the geocoded GPS coordinates will be added to 'Latitude' and 'Longitude' columns. Those columns will be created if they don't exist already")
+st.write("Existing coordinates won't be replaced, only empty values will be geocoded")
 
 if uploaded_file is not None:
     st.write(uploaded_file.name)
